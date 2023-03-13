@@ -113,6 +113,7 @@
             totalCount += count;
             if (count > 0) {
                 window.location.href = assigneeLink.attr("href");
+                return;
             }
             var reviewerLink = $(links[1]);
             count = new Number(reviewerLink.find("span").text());
