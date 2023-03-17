@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         Gitlab 页面优化
+// @name         Gitlab页面优化
 // @namespace    http://tampermonkey.net/
-// @version      0.6
+// @version      0.7
 // @description  优化Gitlab页面展示内容
 // @author       Haifennj
 // @match        http://192.168.0.22/*
@@ -17,6 +17,9 @@
     let css = `
         .nav.navbar-nav li.user-counter.dropdown {
             width: 105px;
+        }
+        .header-search {
+            width: 266px;
         }
         .title-container > ul {
             max-height:40px;
@@ -69,22 +72,39 @@
     // GM_addStyle (newCSS);
 
     var path = window.location.href;
+    debugger;
     var isListPage = path.indexOf("dashboard/merge_requests") > -1;
+    var isAssigneeListPage = path.indexOf("dashboard/merge_requests?assignee_username") > -1;
+    var isReviewerListPage = path.indexOf("dashboard/merge_requests?reviewer_username") > -1;
+    var isTodoPage = path.indexOf("dashboard/todos") > -1;
     var isMRPage = path.indexOf("-/merge_requests") > -1;
+
+    // 列表页面，如果请求为0，则3s刷新页面一次
+    if (isListPage || isTodoPage) {
+        var mrListUrl = "/api/v4/merge_requests?scope=assigned_to_me&state=opened";
+        $.get(mrListUrl, function(data){
+            if (data.length == 0) {
+                setTimeout(function () {
+                    window.location.reload();
+                }, 3 * 1000);
+            }
+        });
+    }
+
     // Merge Request页面，链接添加target标签
     if (path.indexOf("dashboard/merge_requests") > -1) {
-        // var head = document.head || document.getElementsByTagName('head')[0];
-        // var base = document.createElement('base');
-        // base.setAttribute("target","_blank");
-        // head.appendChild(base);
         document.querySelectorAll('span[class="merge-request-title-text js-onboarding-mr-item"]').forEach(linkTag => {
-           linkTag.children[0].setAttribute("target","_blank");
+            var href = linkTag.children[0].getAttribute("href");
+            linkTag.children[0].setAttribute("href","#");
+            linkTag.children[0].setAttribute("onclick","javascript:window.open('"+href+"')");
         })
     }
     // 待办页面，链接添加target标签
     if (path.indexOf("dashboard/todos") > -1) {
         document.querySelectorAll('span[class="title-item todo-label todo-target-link"]').forEach(linkTag => {
-           linkTag.children[0].setAttribute("target","_blank");
+            var href = linkTag.children[0].getAttribute("href");
+            linkTag.children[0].setAttribute("href","#");
+            linkTag.children[0].setAttribute("onclick","javascript:window.open('"+href+"')");
         })
     }
 
@@ -93,6 +113,7 @@
         var navbarNav = $(".navbar-nav");
         var merge_requests = navbarNav.find(".user-counter.dropdown");
         var links = merge_requests.find(".dropdown-menu").find("a");
+        merge_requests.find(".dashboard-shortcuts-merge_requests").hide();
         links.each(function () {
             var newLink = $(this);
             newLink.attr("target","_self");
@@ -105,7 +126,7 @@
     }
 
     // 15秒定时刷新页面
-    setTimeout(function () {
+    var _3sLocation = setTimeout(function () {
         var totalCount = 0;
         if (isListPage) {
             var assigneeLink = $(links[0]);
@@ -125,17 +146,30 @@
                 window.location.href = assigneeLink.attr("href");
             }
         }
-        if (path.indexOf("dashboard/todos") > -1) {
-            window.location.reload();
-        }
     }, 15 * 1000);
 
     // 15分钟后检测是已经合并页面，关闭页面
     setTimeout(function () {
         var totalCount = 0;
         if (isMRPage) {
+            var apiHead = "/api/v4/projects/";
+            var projectId = "";
+            var mrId = 0;
+            var mrUrl = "";
+            var tmp = path.split("/-/");
+            
+            projectId = tmp[0].replace(location.origin+"/","");
+            projectId = projectId.replace("/", "%2F");
+            //vue-aws%2Fawsui/merge_requests/168
+            mrUrl = apiHead + projectId + "/" + tmp[1];
             // 检测是否有已经合并的标记
-            // window.close();
+            $.get(mrUrl, function(data){
+                if (data.state == "merged") {
+                    window.opener=null;
+                    var a = window.open('','_self');
+                    a.close();
+                }
+            });
         }
     }, 15 * 60 * 1000);
 
@@ -227,7 +261,7 @@
         var li = $("<li class='nav-item'></li>");
         var a = $("<a></a>");
         a.text(element.name);
-        a.attr("target","_self");
+        a.attr("target","_blank");
         a.attr("href",element.link);
         a.attr("class","nav-link custom-link " + element.class);
         li.append(a);
@@ -235,6 +269,3 @@
     });
 
 })();
-
-
-
