@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Gitlab页面优化
 // @namespace    http://tampermonkey.net/
-// @version      0.7
+// @version      0.8
 // @description  优化Gitlab页面展示内容
 // @author       Haifennj
 // @match        http://192.168.0.22/*
@@ -72,10 +72,7 @@
     // GM_addStyle (newCSS);
 
     var path = window.location.href;
-    debugger;
     var isListPage = path.indexOf("dashboard/merge_requests") > -1;
-    var isAssigneeListPage = path.indexOf("dashboard/merge_requests?assignee_username") > -1;
-    var isReviewerListPage = path.indexOf("dashboard/merge_requests?reviewer_username") > -1;
     var isTodoPage = path.indexOf("dashboard/todos") > -1;
     var isMRPage = path.indexOf("-/merge_requests") > -1;
 
@@ -166,8 +163,8 @@
             $.get(mrUrl, function(data){
                 if (data.state == "merged") {
                     window.opener=null;
-                    var a = window.open('','_self');
-                    a.close();
+                    window.open('','_self');
+                    window.close();
                 }
             });
         }
