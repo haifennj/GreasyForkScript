@@ -153,7 +153,7 @@
     }
 
     // 15分钟后检测是已经合并页面，关闭页面
-    // setTimeout(function () {
+    setTimeout(function () {
         var totalCount = 0;
         if (isMRPage) {
             var apiHead = "/api/v4/projects/";
@@ -168,15 +168,14 @@
             mrUrl = apiHead + projectId + "/" + tmp[1];
             // 检测是否有已经合并的标记
             $.get(mrUrl, function (data) {
-                debugger
-                if (data.state == "merged" && (!isCommits && !isDiffs)) {
+                if (data.state == "merged" && $(".notes-tab.active").length == 0) {
                     window.opener = null;
                     window.open('', '_self');
                     window.close();
                 }
             });
         }
-    // }, 5 * 60 * 1000);
+    }, 5  * 1000);//* 60
 
     try {
         function sendNotification() {
