@@ -11,7 +11,7 @@
 // @grant        GM_addStyle
 // ==/UserScript==
 
-(function() {
+(function () {
     'use strict';
 
     let css = `
@@ -75,33 +75,63 @@
     var isListPage = path.indexOf("dashboard/merge_requests") > -1;
     var isTodoPage = path.indexOf("dashboard/todos") > -1;
     var isMRPage = path.indexOf("-/merge_requests") > -1;
+    var isCommits = path.indexOf("/commits") > -1;
+    var isDiffs = path.indexOf("/diffs") > -1;
 
     // 列表页面，如果请求为0，则3s刷新页面一次
-    if (isListPage || isTodoPage) {
-        var mrListUrl = "/api/v4/merge_requests?scope=assigned_to_me&state=opened";
-        $.get(mrListUrl, function(data){
-            if (data.length == 0) {
-                setTimeout(function () {
-                    window.location.reload();
-                }, 3 * 1000);
-            }
-        });
+    // if (isListPage || isTodoPage) {
+    //     var mrListUrl = "/api/v4/merge_requests?scope=assigned_to_me&state=opened";
+    //     $.get(mrListUrl, function (data) {
+    //         if (data.length == 0) {
+    //             setTimeout(function () {
+    //                 window.location.reload();
+    //             }, 3 * 1000);
+    //         }
+    //     });
+    // }
+
+    // 15秒定时刷新页面
+    var totalCount = 0;
+    if (isListPage) {
+        var assigneeLink = $(links[0]);
+        var count = new Number(assigneeLink.find("span").text());
+        totalCount += count;
+        if (count > 0) {
+            setTimeout(function () {
+                window.location.href = assigneeLink.attr("href");
+            }, 15 * 1000);
+        }
+        var reviewerLink = $(links[1]);
+        count = new Number(reviewerLink.find("span").text());
+        totalCount += count;
+        if (count > 0) {
+            setTimeout(function () {
+                window.location.href = reviewerLink.attr("href");
+            }, 15 * 1000);
+        }
+        if (totalCount == 0) {
+            setTimeout(function () {
+                window.location.href = assigneeLink.attr("href");
+            }, 3 * 1000);
+        }
     }
+
+
 
     // Merge Request页面，链接添加target标签
     if (path.indexOf("dashboard/merge_requests") > -1) {
         document.querySelectorAll('span[class="merge-request-title-text js-onboarding-mr-item"]').forEach(linkTag => {
             var href = linkTag.children[0].getAttribute("href");
-            linkTag.children[0].setAttribute("href","#");
-            linkTag.children[0].setAttribute("onclick","javascript:window.open('"+href+"')");
+            linkTag.children[0].setAttribute("href", "#");
+            linkTag.children[0].setAttribute("onclick", "javascript:window.open('" + href + "')");
         })
     }
     // 待办页面，链接添加target标签
     if (path.indexOf("dashboard/todos") > -1) {
         document.querySelectorAll('span[class="title-item todo-label todo-target-link"]').forEach(linkTag => {
             var href = linkTag.children[0].getAttribute("href");
-            linkTag.children[0].setAttribute("href","#");
-            linkTag.children[0].setAttribute("onclick","javascript:window.open('"+href+"')");
+            linkTag.children[0].setAttribute("href", "#");
+            linkTag.children[0].setAttribute("onclick", "javascript:window.open('" + href + "')");
         })
     }
 
@@ -113,8 +143,8 @@
         merge_requests.find(".dashboard-shortcuts-merge_requests").hide();
         links.each(function () {
             var newLink = $(this);
-            newLink.attr("target","_self");
-            newLink.css({"height":"17px","padding":"0 2px","margin":"2px 2px 1px"});
+            newLink.attr("target", "_self");
+            newLink.css({ "height": "17px", "padding": "0 2px", "margin": "2px 2px 1px" });
             merge_requests.append(newLink);
         });
         merge_requests.find(".dashboard-shortcuts-merge_requests").remove();
@@ -122,31 +152,8 @@
         console.log(error)
     }
 
-    // 15秒定时刷新页面
-    var _3sLocation = setTimeout(function () {
-        var totalCount = 0;
-        if (isListPage) {
-            var assigneeLink = $(links[0]);
-            var count = new Number(assigneeLink.find("span").text());
-            totalCount += count;
-            if (count > 0) {
-                window.location.href = assigneeLink.attr("href");
-                return;
-            }
-            var reviewerLink = $(links[1]);
-            count = new Number(reviewerLink.find("span").text());
-            totalCount += count;
-            if (count > 0) {
-                window.location.href = reviewerLink.attr("href");
-            }
-            if (totalCount == 0) {
-                window.location.href = assigneeLink.attr("href");
-            }
-        }
-    }, 15 * 1000);
-
     // 15分钟后检测是已经合并页面，关闭页面
-    setTimeout(function () {
+    // setTimeout(function () {
         var totalCount = 0;
         if (isMRPage) {
             var apiHead = "/api/v4/projects/";
@@ -154,101 +161,102 @@
             var mrId = 0;
             var mrUrl = "";
             var tmp = path.split("/-/");
-            
-            projectId = tmp[0].replace(location.origin+"/","");
+
+            projectId = tmp[0].replace(location.origin + "/", "");
             projectId = projectId.replace("/", "%2F");
             //vue-aws%2Fawsui/merge_requests/168
             mrUrl = apiHead + projectId + "/" + tmp[1];
             // 检测是否有已经合并的标记
-            $.get(mrUrl, function(data){
-                if (data.state == "merged") {
-                    window.opener=null;
-                    window.open('','_self');
+            $.get(mrUrl, function (data) {
+                debugger
+                if (data.state == "merged" && (!isCommits && !isDiffs)) {
+                    window.opener = null;
+                    window.open('', '_self');
                     window.close();
                 }
             });
         }
-    }, 15 * 60 * 1000);
+    // }, 5 * 60 * 1000);
 
     try {
         function sendNotification() {
             new Notification("通知标题：", {
-              body: '通知内容',
-              icon: 'https://pic1.zhuanstatic.com/zhuanzh/50b6ffe4-c7e3-4317-bc59-b2ec4931f325.png'
+                body: '通知内容',
+                icon: 'https://pic1.zhuanstatic.com/zhuanzh/50b6ffe4-c7e3-4317-bc59-b2ec4931f325.png'
             })
         }
         if (window.Notification.permission == "granted") { // 判断是否有权限
-           sendNotification();
-         } else if (window.Notification.permission != "denied") { 
-           window.Notification.requestPermission(function (permission) { // 没有权限发起请求
-             sendNotification();
-           });
-         }
+            sendNotification();
+        } else if (window.Notification.permission != "denied") {
+            window.Notification.requestPermission(function (permission) { // 没有权限发起请求
+                sendNotification();
+            });
+        }
     } catch (error) {
-        
+
     }
-    
+
     // 常用仓库列表
     var repos = [
         {
-            name:"open/aws",
-            link:"/open/aws",
-            class:"open",
+            name: "open/aws",
+            link: "/open/aws",
+            class: "open",
         },
         {
-            name:"open/web",
-            link:"/open/web",
-            class:"open",
+            name: "open/web",
+            link: "/open/web",
+            class: "open",
         },
         {
-            name:"open/release",
-            link:"/open/release",
-            class:"open",
+            name: "open/release",
+            link: "/open/release",
+            class: "open",
         },
         {
-            name:"apps/bpms",
-            link:"/apps/bpms",
-            class:"apps",
+            name: "apps/bpms",
+            link: "/apps/bpms",
+            class: "apps",
         },
         {
-            name:"apps/basic-service",
-            link:"/apps/basic-service",
-            class:"apps",
+            name: "apps/basic-service",
+            link: "/apps/basic-service",
+            class: "apps",
         },
         {
-            name:"apps/office",
-            link:"/apps/office",
-            class:"apps",
+            name: "apps/office",
+            link: "/apps/office",
+            class: "apps",
         },
         {
-            name:"apps/yijingcloud",
-            link:"/apps/yijingcloud",
-            class:"apps",
+            name: "apps/yijingcloud",
+            link: "/apps/yijingcloud",
+            class: "apps",
         },
         {
-            name:"security/engine",
-            link:"/security/aws-bpmn-engine",
-            class:"security",
+            name: "security/engine",
+            link: "/security/aws-bpmn-engine",
+            class: "security",
         },
         {
-            name:"security/core",
-            link:"/security/aws-infrastructure-core",
-            class:"security",
+            name: "security/core",
+            link: "/security/aws-infrastructure-core",
+            class: "security",
         },
         {
-            name:"vue-aws/aws",
-            link:"/vue-aws/aws",
-            class:"vue",
+            name: "vue-aws/aws",
+            link: "/vue-aws/aws",
+            class: "vue",
         },
         {
-            name:"vue-aws/awsui",
-            link:"/vue-aws/awsui",
-            class:"vue",
+            name: "vue-aws/awsui",
+            link: "/vue-aws/awsui",
+            class: "vue",
         },
         {
-            name:"vue-apps/yijingcloud",
-            link:"/vue-apps/yijingcloud",
-            class:"vue-apps",
+            name: "vue-apps/yijingcloud",
+            link: "/vue-apps/yijingcloud",
+            class: "vue-apps",
         }
     ];
     var titleContainer = $(".title-container");
@@ -258,9 +266,9 @@
         var li = $("<li class='nav-item'></li>");
         var a = $("<a></a>");
         a.text(element.name);
-        a.attr("target","_blank");
-        a.attr("href",element.link);
-        a.attr("class","nav-link custom-link " + element.class);
+        a.attr("target", "_blank");
+        a.attr("href", element.link);
+        a.attr("class", "nav-link custom-link " + element.class);
         li.append(a);
         ul.append(li);
     });
