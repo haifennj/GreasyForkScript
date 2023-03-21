@@ -168,14 +168,14 @@
             mrUrl = apiHead + projectId + "/" + tmp[1];
             // 检测是否有已经合并的标记
             $.get(mrUrl, function (data) {
-                if (data.state == "merged" && $(".notes-tab.active").length == 0) {
+                if (data.state == "merged" && $(".notes-tab.active").length > 0) {
                     window.opener = null;
                     window.open('', '_self');
                     window.close();
                 }
             });
         }
-    }, 5  * 1000);//* 60
+    }, 5 * 60 * 1000);
 
     try {
         function sendNotification() {
