@@ -90,6 +90,10 @@
     //     });
     // }
 
+    var navbarNav = $(".navbar-nav");
+    var merge_requests = navbarNav.find(".user-counter.dropdown");
+    var links = merge_requests.find(".dropdown-menu").find("a");
+
     // 15秒定时刷新页面
     var totalCount = 0;
     if (isListPage) {
@@ -100,19 +104,20 @@
             setTimeout(function () {
                 window.location.href = assigneeLink.attr("href");
             }, 15 * 1000);
-        }
-        var reviewerLink = $(links[1]);
-        count = new Number(reviewerLink.find("span").text());
-        totalCount += count;
-        if (count > 0) {
-            setTimeout(function () {
-                window.location.href = reviewerLink.attr("href");
-            }, 15 * 1000);
-        }
-        if (totalCount == 0) {
-            setTimeout(function () {
-                window.location.href = assigneeLink.attr("href");
-            }, 3 * 1000);
+        } else {
+            var reviewerLink = $(links[1]);
+            count = new Number(reviewerLink.find("span").text());
+            totalCount += count;
+            if (count > 0) {
+                setTimeout(function () {
+                    window.location.href = reviewerLink.attr("href");
+                }, 15 * 1000);
+            }
+            if (totalCount == 0) {
+                setTimeout(function () {
+                    window.location.href = assigneeLink.attr("href");
+                }, 3 * 1000);
+            }
         }
     }
 
@@ -137,9 +142,6 @@
 
     // 优化Merge Request页面，添加两个链接
     try {
-        var navbarNav = $(".navbar-nav");
-        var merge_requests = navbarNav.find(".user-counter.dropdown");
-        var links = merge_requests.find(".dropdown-menu").find("a");
         merge_requests.find(".dashboard-shortcuts-merge_requests").hide();
         links.each(function () {
             var newLink = $(this);
