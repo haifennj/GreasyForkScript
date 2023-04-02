@@ -1,14 +1,16 @@
 // ==UserScript==
 // @name         Gitlab页面优化
 // @namespace    http://tampermonkey.net/
-// @version      0.8
+// @version      0.9
 // @description  优化Gitlab页面展示内容
 // @author       Haifennj
 // @match        http://192.168.0.22/*
 // @require      https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js
 // @require      https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js
+// @require      https://unpkg.com/@wcjiang/notify/dist/notify.min.js
 // @resource     bootstrapCSS https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css
 // @grant        GM_addStyle
+// @grant        GM_notification
 // ==/UserScript==
 
 (function () {
@@ -66,10 +68,6 @@
     `
     GM_addStyle(css);
 
-    // $("head").append($(`<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">`));
-    // //加载外部CSS，资源已在上方resource中
-    // var newCSS = GM_getResourceText ("bootstrapCSS");
-    // GM_addStyle (newCSS);
 
     var path = window.location.href;
     var isListPage = path.indexOf("dashboard/merge_requests") > -1;
@@ -94,6 +92,45 @@
     var merge_requests = navbarNav.find(".user-counter.dropdown");
     var links = merge_requests.find(".dropdown-menu").find("a");
 
+    var mrCount = new Number(merge_requests.find(".js-merge-requests-count").text())
+    var newTitle = "";
+    var oldTitle = document.title;
+    if (mrCount > 0) {
+        newTitle = mrCount + "个合并请求待处理";
+        document.title = newTitle;
+        GM_notification({
+            text: newTitle,
+            title: "合并请求",
+            image:"http://192.168.0.22/assets/gitlab_logo-7ae504fe4f68fdebb3c2034e36621930cd36ea87924c11ff65dbcb8ed50dca58.png",
+        });
+        var notify = new Notify({
+            message: '有消息了。',//标题
+            effect: 'flash', // flash | scroll 闪烁还是滚动
+            //可选播放声音
+            // audio:{
+            //     //可以使用数组传多种格式的声音文件
+            //     file: ['msg.mp4','msg.mp3','msg.wav']
+            //     //下面也是可以的哦
+            //     //file: 'msg.mp4'
+            // },
+            //标题闪烁，或者滚动速度
+            interval: 500,
+            //可选，默认绿底白字的  Favicon
+            updateFavicon:{
+                // favicon 字体颜色
+                textColor: "#fff",
+                //背景颜色，设置背景颜色透明，将值设置为“transparent”
+                backgroundColor: "#e24329" 
+            }
+        });
+        notify.setFavicon(mrCount).player();
+        notify.setTitle(true);
+        notify.setTitle(newTitle);
+        notify.setTitle();
+    }
+
+
+    // ************************************************************ //
     // 15秒定时刷新页面
     var totalCount = 0;
     if (isListPage) {
@@ -122,13 +159,13 @@
     }
 
 
-
+    // ************************************************************ //
     // Merge Request页面，链接添加target标签
     if (path.indexOf("dashboard/merge_requests") > -1) {
         document.querySelectorAll('span[class="merge-request-title-text js-onboarding-mr-item"]').forEach(linkTag => {
             var href = linkTag.children[0].getAttribute("href");
             linkTag.children[0].setAttribute("href", "#");
-            linkTag.children[0].setAttribute("onclick", "javascript:window.open('" + href + "')");
+            linkTag.children[0].setAttribute("onclick", "javascript:window.open('" + href + "','" + href + "')");
         })
     }
     // 待办页面，链接添加target标签
@@ -136,10 +173,11 @@
         document.querySelectorAll('span[class="title-item todo-label todo-target-link"]').forEach(linkTag => {
             var href = linkTag.children[0].getAttribute("href");
             linkTag.children[0].setAttribute("href", "#");
-            linkTag.children[0].setAttribute("onclick", "javascript:window.open('" + href + "')");
+            linkTag.children[0].setAttribute("onclick", "javascript:window.open('" + href + "','" + href + "')");
         })
     }
 
+    // ************************************************************ //
     // 优化Merge Request页面，添加两个链接
     try {
         merge_requests.find(".dashboard-shortcuts-merge_requests").hide();
@@ -154,6 +192,7 @@
         console.log(error)
     }
 
+    // ************************************************************ //
     // 15分钟后检测是已经合并页面，关闭页面
     setTimeout(function () {
         var totalCount = 0;
@@ -179,24 +218,7 @@
         }
     }, 5 * 60 * 1000);
 
-    try {
-        function sendNotification() {
-            new Notification("通知标题：", {
-                body: '通知内容',
-                icon: 'https://pic1.zhuanstatic.com/zhuanzh/50b6ffe4-c7e3-4317-bc59-b2ec4931f325.png'
-            })
-        }
-        if (window.Notification.permission == "granted") { // 判断是否有权限
-            sendNotification();
-        } else if (window.Notification.permission != "denied") {
-            window.Notification.requestPermission(function (permission) { // 没有权限发起请求
-                sendNotification();
-            });
-        }
-    } catch (error) {
-
-    }
-
+    // ************************************************************ //
     // 常用仓库列表
     var repos = [
         {
