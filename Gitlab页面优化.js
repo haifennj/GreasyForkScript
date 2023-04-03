@@ -95,7 +95,7 @@
     var mrCount = new Number(merge_requests.find(".js-merge-requests-count").text())
     var newTitle = "";
     var oldTitle = document.title;
-    if (mrCount > 0) {
+    if (isListPage && mrCount > 0) {
         newTitle = mrCount + "个合并请求待处理";
         document.title = newTitle;
         GM_notification({
@@ -104,7 +104,7 @@
             image:"http://192.168.0.22/assets/gitlab_logo-7ae504fe4f68fdebb3c2034e36621930cd36ea87924c11ff65dbcb8ed50dca58.png",
         });
         var notify = new Notify({
-            message: '有消息了。',//标题
+            //message: '有消息了。',//标题
             effect: 'flash', // flash | scroll 闪烁还是滚动
             //可选播放声音
             // audio:{
@@ -114,19 +114,30 @@
             //     //file: 'msg.mp4'
             // },
             //标题闪烁，或者滚动速度
-            interval: 500,
+            // interval: 500,
             //可选，默认绿底白字的  Favicon
             updateFavicon:{
                 // favicon 字体颜色
                 textColor: "#fff",
                 //背景颜色，设置背景颜色透明，将值设置为“transparent”
-                backgroundColor: "#e24329" 
+                backgroundColor: "#fc6d26" 
             }
         });
         notify.setFavicon(mrCount).player();
         notify.setTitle(true);
         notify.setTitle(newTitle);
-        notify.setTitle();
+
+        var time = 0;
+        setInterval(()=>{
+            if (time % 2 == 0) {
+                notify.setTitle();
+                notify.setTitle(oldTitle);
+            } else {
+                notify.setTitle();
+                notify.setTitle(newTitle);
+            }
+            time++;
+        }, 500);
     }
 
 
@@ -152,7 +163,7 @@
             }
             if (totalCount == 0) {
                 setTimeout(function () {
-                    window.location.href = assigneeLink.attr("href");
+                   window.location.href = assigneeLink.attr("href");
                 }, 3 * 1000);
             }
         }
