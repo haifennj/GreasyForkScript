@@ -18,10 +18,10 @@
 
     let css = `
         .nav.navbar-nav li.user-counter.dropdown {
-            width: 105px;
+            width: 106px;
         }
         .header-search {
-            width: 266px;
+            width: 265px;
         }
         .title-container > ul {
             max-height:40px;
@@ -66,8 +66,20 @@
             background:#D3540070;
         }
     `
-    GM_addStyle(css);
+    try {
+        GM_addStyle(css);
+    } catch (error) {
+        let el = document.createElement('style')
+        el.type = 'text/css'
+        el.innerText = css
+        document.head.appendChild(el);
+    }
 
+    var userAgent = navigator.userAgent.toLowerCase();
+    console.log(userAgent)
+    var isMobile = !!userAgent.match(/(mobile)/i);
+    var isPC = !isMobile;
+    console.log("ismobile,,",isMobile)
 
     var path = window.location.href;
     var isListPage = path.indexOf("dashboard/merge_requests") > -1;
@@ -144,27 +156,29 @@
     // ************************************************************ //
     // 15秒定时刷新页面
     var totalCount = 0;
-    if (isListPage) {
-        var assigneeLink = $(links[0]);
-        var count = new Number(assigneeLink.find("span").text());
-        totalCount += count;
-        if (count > 0) {
-            setTimeout(function () {
-                window.location.href = assigneeLink.attr("href");
-            }, 15 * 1000);
-        } else {
-            var reviewerLink = $(links[1]);
-            count = new Number(reviewerLink.find("span").text());
+    if (isPC) {
+        if (isListPage) {
+            var assigneeLink = $(links[0]);
+            var count = new Number(assigneeLink.find("span").text());
             totalCount += count;
             if (count > 0) {
                 setTimeout(function () {
-                    window.location.href = reviewerLink.attr("href");
+                    window.location.href = assigneeLink.attr("href");
                 }, 15 * 1000);
-            }
-            if (totalCount == 0) {
-                setTimeout(function () {
-                   window.location.href = assigneeLink.attr("href");
-                }, 3 * 1000);
+            } else {
+                var reviewerLink = $(links[1]);
+                count = new Number(reviewerLink.find("span").text());
+                totalCount += count;
+                if (count > 0) {
+                    setTimeout(function () {
+                        window.location.href = reviewerLink.attr("href");
+                    }, 15 * 1000);
+                }
+                if (totalCount == 0) {
+                    setTimeout(function () {
+                        window.location.href = assigneeLink.attr("href");
+                    }, 3 * 1000);
+                }
             }
         }
     }
@@ -190,7 +204,7 @@
 
     // ************************************************************ //
     // 优化Merge Request页面，添加两个链接
-    try {
+    if (isPC) {
         merge_requests.find(".dashboard-shortcuts-merge_requests").hide();
         links.each(function () {
             var newLink = $(this);
@@ -199,12 +213,29 @@
             merge_requests.append(newLink);
         });
         merge_requests.find(".dashboard-shortcuts-merge_requests").remove();
-    } catch (error) {
-        console.log(error)
+    }
+    if (isMobile) {
+        var logo = $("header").find(".title-container").find("h1");
+        var ul = $('<ul class="nav navbar-nav"></ul>');
+        merge_requests.find(".dashboard-shortcuts-merge_requests").hide();
+        links.each(function () {
+            var newLink = $(this);
+            newLink.attr("target", "_self");
+            newLink.attr("class", "shortcuts-todos js-prefetch-document");
+            newLink.css({ "padding": "0 4px", "margin-left": "5px" });
+            var li = $('<li class="user-counter active"></li>');
+            li.append(newLink);
+            ul.append(li);
+        });
+        logo.append(ul);
     }
 
     // ************************************************************ //
     // 15分钟后检测是已经合并页面，关闭页面
+    var delayCloseTime = 5 * 60 * 1000;
+    if (isMobile) {
+        delayCloseTime = 3000;
+    }
     setTimeout(function () {
         var totalCount = 0;
         if (isMRPage) {
@@ -227,7 +258,7 @@
                 }
             });
         }
-    }, 5 * 60 * 1000);
+    }, delayCloseTime);
 
     // ************************************************************ //
     // 常用仓库列表
@@ -293,18 +324,20 @@
             class: "vue-apps",
         }
     ];
-    var titleContainer = $(".title-container");
-    var ul = $("<ul class='nav navbar-sub-nav'></ul>");
-    titleContainer.append(ul);
-    repos.forEach(element => {
-        var li = $("<li class='nav-item'></li>");
-        var a = $("<a></a>");
-        a.text(element.name);
-        a.attr("target", "_blank");
-        a.attr("href", element.link);
-        a.attr("class", "nav-link custom-link " + element.class);
-        li.append(a);
-        ul.append(li);
-    });
+    if (isPC) {
+        var titleContainer = $(".title-container");
+        var ul = $("<ul class='nav navbar-sub-nav'></ul>");
+        titleContainer.append(ul);
+        repos.forEach(element => {
+            var li = $("<li class='nav-item'></li>");
+            var a = $("<a></a>");
+            a.text(element.name);
+            a.attr("target", "_blank");
+            a.attr("href", element.link);
+            a.attr("class", "nav-link custom-link " + element.class);
+            li.append(a);
+            ul.append(li);
+        });
+    }
 
 })();
