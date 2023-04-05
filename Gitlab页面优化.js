@@ -212,7 +212,7 @@
 
     // ************************************************************ //
     // 优化Merge Request页面，添加两个链接
-    if (isPC) {
+    if (isPC || isiPad) {
         merge_requests.find(".dashboard-shortcuts-merge_requests").hide();
         links.each(function () {
             var newLink = $(this);
@@ -241,7 +241,7 @@
     // ************************************************************ //
     // 15分钟后检测是已经合并页面，关闭页面
     var delayCloseTime = 5 * 60 * 1000;
-    if (isMobile) {
+    if (isMobile || isiPad) {
         delayCloseTime = 3000;
     }
     setTimeout(function () {
