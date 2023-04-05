@@ -79,6 +79,8 @@
     console.log(userAgent)
     var isMobile = !!userAgent.match(/(mobile)/i);
     var isPC = !isMobile;
+    var isiPad = (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    isPC = !isiPad;
     console.log("ismobile,,",isMobile)
 
     var path = window.location.href;
@@ -110,46 +112,52 @@
     if (isListPage && mrCount > 0) {
         newTitle = mrCount + "个合并请求待处理";
         document.title = newTitle;
-        GM_notification({
-            text: newTitle,
-            title: "合并请求",
-            image:"http://192.168.0.22/assets/gitlab_logo-7ae504fe4f68fdebb3c2034e36621930cd36ea87924c11ff65dbcb8ed50dca58.png",
-        });
-        var notify = new Notify({
-            //message: '有消息了。',//标题
-            effect: 'flash', // flash | scroll 闪烁还是滚动
-            //可选播放声音
-            // audio:{
-            //     //可以使用数组传多种格式的声音文件
-            //     file: ['msg.mp4','msg.mp3','msg.wav']
-            //     //下面也是可以的哦
-            //     //file: 'msg.mp4'
-            // },
-            //标题闪烁，或者滚动速度
-            // interval: 500,
-            //可选，默认绿底白字的  Favicon
-            updateFavicon:{
-                // favicon 字体颜色
-                textColor: "#fff",
-                //背景颜色，设置背景颜色透明，将值设置为“transparent”
-                backgroundColor: "#fc6d26" 
-            }
-        });
-        notify.setFavicon(mrCount).player();
-        notify.setTitle(true);
-        notify.setTitle(newTitle);
-
-        var time = 0;
-        setInterval(()=>{
-            if (time % 2 == 0) {
-                notify.setTitle();
-                notify.setTitle(oldTitle);
-            } else {
-                notify.setTitle();
-                notify.setTitle(newTitle);
-            }
-            time++;
-        }, 500);
+        try {
+            GM_notification({
+                text: newTitle,
+                title: "合并请求",
+                image:"http://192.168.0.22/assets/gitlab_logo-7ae504fe4f68fdebb3c2034e36621930cd36ea87924c11ff65dbcb8ed50dca58.png",
+            });
+        } catch (error) {
+        }
+        try {
+            var notify = new Notify({
+                //message: '有消息了。',//标题
+                effect: 'flash', // flash | scroll 闪烁还是滚动
+                //可选播放声音
+                // audio:{
+                //     //可以使用数组传多种格式的声音文件
+                //     file: ['msg.mp4','msg.mp3','msg.wav']
+                //     //下面也是可以的哦
+                //     //file: 'msg.mp4'
+                // },
+                //标题闪烁，或者滚动速度
+                // interval: 500,
+                //可选，默认绿底白字的  Favicon
+                updateFavicon:{
+                    // favicon 字体颜色
+                    textColor: "#fff",
+                    //背景颜色，设置背景颜色透明，将值设置为“transparent”
+                    backgroundColor: "#fc6d26" 
+                }
+            });
+            notify.setFavicon(mrCount).player();
+            notify.setTitle(true);
+            notify.setTitle(newTitle);
+    
+            var time = 0;
+            setInterval(()=>{
+                if (time % 2 == 0) {
+                    notify.setTitle();
+                    notify.setTitle(oldTitle);
+                } else {
+                    notify.setTitle();
+                    notify.setTitle(newTitle);
+                }
+                time++;
+            }, 500);
+        } catch (error) {
+        }
     }
 
 
@@ -186,7 +194,7 @@
 
     // ************************************************************ //
     // Merge Request页面，链接添加target标签
-    if (path.indexOf("dashboard/merge_requests") > -1) {
+    if (isListPage) {
         document.querySelectorAll('span[class="merge-request-title-text js-onboarding-mr-item"]').forEach(linkTag => {
             var href = linkTag.children[0].getAttribute("href");
             linkTag.children[0].setAttribute("href", "#");
@@ -194,7 +202,7 @@
         })
     }
     // 待办页面，链接添加target标签
-    if (path.indexOf("dashboard/todos") > -1) {
+    if (isTodoPage) {
         document.querySelectorAll('span[class="title-item todo-label todo-target-link"]').forEach(linkTag => {
             var href = linkTag.children[0].getAttribute("href");
             linkTag.children[0].setAttribute("href", "#");
