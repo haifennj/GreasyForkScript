@@ -212,7 +212,7 @@
 
     // ************************************************************ //
     // 优化Merge Request页面，添加两个链接
-    if (isPC || isiPad) {
+    if (isPC) {
         merge_requests.find(".dashboard-shortcuts-merge_requests").hide();
         links.each(function () {
             var newLink = $(this);
@@ -221,9 +221,14 @@
             merge_requests.append(newLink);
         });
         merge_requests.find(".dashboard-shortcuts-merge_requests").remove();
-    }
-    if (isMobile) {
-        var logo = $("header").find(".title-container").find("h1");
+    } else {
+        var logo;
+        if (isMobile) {
+            logo = $("header").find(".title-container").find("h1");
+        }
+        if (isiPad) {
+            logo = $("header").find(".title-container").find(".navbar-sub-nav")
+        }
         var ul = $('<ul class="nav navbar-nav"></ul>');
         merge_requests.find(".dashboard-shortcuts-merge_requests").hide();
         links.each(function () {
