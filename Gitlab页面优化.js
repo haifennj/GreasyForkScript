@@ -158,6 +158,8 @@
             }, 500);
         } catch (error) {
         }
+    } else {
+        document.title = oldTitle;
     }
 
 
