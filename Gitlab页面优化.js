@@ -80,7 +80,7 @@
     var isMobile = !!userAgent.match(/(mobile)/i);
     var isPC = !isMobile;
     var isiPad = (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    isPC = !isiPad;
+    
     console.log("ismobile,,",isMobile)
 
     var path = window.location.href;
