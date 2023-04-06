@@ -81,8 +81,6 @@
     var isPC = !isMobile;
     var isiPad = (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     
-    console.log("ismobile,,",isMobile)
-
     var path = window.location.href;
     var isListPage = path.indexOf("dashboard/merge_requests") > -1;
     var isTodoPage = path.indexOf("dashboard/todos") > -1;
