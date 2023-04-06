@@ -58,10 +58,11 @@
             background-color: rgba(90,90,90,.85);
             border-radius: 4px;
         }
-
+    `
+    let queryCSS = `
         .text-center.form-actions .label {
             line-height: 24px;
-            padding: 0 20px 0 8px;
+            padding: 0 2px 0 5px;
             display: inline-block;
             background-color: #EEEEEE;
             color: #A6AAB8;
@@ -72,13 +73,11 @@
             overflow: hidden;
             position: relative;
         }
-
-        .text-center.form-actions ul,.text-center.form-actions li{
-            list-style-type: none;
-            display: flex;
+        .text-center.form-actions .a .i {
+            font-size:12px;
         }
     `
-    GM_addStyle(css);
+    GM_addStyle(queryCSS);
     /*
         // 定向
         let url = window.location.href;
@@ -136,18 +135,26 @@
         }
     }
 
+    var findQuery = function(){
+        setTimeout(function () {
+            $(".custom-query").remove();
+            $("#userQueries").find("ul").children().each(function(){
+                var li = $(this);
+                var a = li.find("a");
+                a.addClass("custom-query");
+                $(".btn-reset-form").after(li.find("a"));
+            });
+        }, 300);
+    }
+
     // 添加快速查询条件
     if (window.flow != 'full') {
         $('.querybox-toggle').off("click").on("click", function () {
             $(this).parent().toggleClass('active');
-            $(".btn-reset-form").after($("#userQueries").find("ul"));
+            findQuery()
         });
     }
-    setTimeout(function () {
-        if ($(".btn-reset-form").length > 0) {
-            $(".btn-reset-form").after($("#userQueries").find("ul"));
-        }
-    }, 300);
+    findQuery();
 
     // XX解决的
     // XX人X级别的
