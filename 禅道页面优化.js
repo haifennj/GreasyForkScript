@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         禅道页面优化
 // @namespace    http://tampermonkey.net/
-// @version      0.5
+// @version      0.6
 // @description  禅道页面优化1
 // @author       You
 // @match        http://111.200.241.83:3383/zentao/*
@@ -73,7 +73,7 @@
             overflow: hidden;
             position: relative;
         }
-        .text-center.form-actions .a .i {
+        .text-center.form-actions a i {
             font-size:12px;
         }
     `
