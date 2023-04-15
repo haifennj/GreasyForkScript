@@ -194,7 +194,7 @@
 
     // ************************************************************ //
     // Merge Request页面，链接添加target标签
-    if (isListPage) {
+    if (isListPage && !isMobile) {
         document.querySelectorAll('span[class="merge-request-title-text js-onboarding-mr-item"]').forEach(linkTag => {
             var href = linkTag.children[0].getAttribute("href");
             linkTag.children[0].setAttribute("href", "#");
@@ -202,7 +202,7 @@
         })
     }
     // 待办页面，链接添加target标签
-    if (isTodoPage) {
+    if (isTodoPage && !isMobile) {
         document.querySelectorAll('span[class="title-item todo-label todo-target-link"]').forEach(linkTag => {
             var href = linkTag.children[0].getAttribute("href");
             linkTag.children[0].setAttribute("href", "#");
@@ -212,7 +212,7 @@
 
     // ************************************************************ //
     // 优化Merge Request页面，添加两个链接
-    if (isPC) {
+    if (isPC && !isiPad) {
         merge_requests.find(".dashboard-shortcuts-merge_requests").hide();
         links.each(function () {
             var newLink = $(this);
@@ -337,7 +337,7 @@
             class: "vue-apps",
         }
     ];
-    if (isPC) {
+    if (isPC && !isiPad) {
         var titleContainer = $(".title-container");
         var ul = $("<ul class='nav navbar-sub-nav'></ul>");
         titleContainer.append(ul);
