@@ -164,7 +164,7 @@
     // ************************************************************ //
     // 15秒定时刷新页面
     var totalCount = 0;
-    if (isPC) {
+    if (isPC && !isiPad) {
         if (isListPage) {
             var assigneeLink = $(links[0]);
             var count = new Number(assigneeLink.find("span").text());
