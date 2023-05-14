@@ -83,6 +83,9 @@
     
     var path = window.location.href;
     var isListPage = path.indexOf("dashboard/merge_requests") > -1;
+    if (path.indexOf("state=merged") > -1 || path.indexOf("state=closed") > -1 || path.indexOf("state=all") > -1) {
+        isListPage = false;
+    }
     var isTodoPage = path.indexOf("dashboard/todos") > -1;
     var isMRPage = path.indexOf("-/merge_requests") > -1;
     var isCommits = path.indexOf("/commits") > -1;
