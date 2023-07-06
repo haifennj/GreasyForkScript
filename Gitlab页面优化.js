@@ -285,11 +285,6 @@
             class: "open",
         },
         {
-            name: "open/web",
-            link: "/open/web",
-            class: "open",
-        },
-        {
             name: "open/release",
             link: "/open/release",
             class: "open",
