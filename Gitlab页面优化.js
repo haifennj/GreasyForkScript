@@ -41,14 +41,30 @@
         .title-container > ul:hover::-webkit-scrollbar-thumb:hover {
             background-color: #c0cecc;
         }
-        
+
         .title-container > ul:hover::-webkit-scrollbar-thumb:vertical {
             background-color: #c0cedc;
-            border-radius: 6px;            
+            border-radius: 6px;
         }
         a.nav-link.custom-link {
             height: 16px !important;
             margin: 2px 3px 0 0 !important;
+        }
+        /*流水线页面样式优化*/
+        .gl-text-truncate {
+            overflow: hidden;
+            text-overflow: initial;
+            white-space: initial;
+        }
+        /*仓库列表页面优化*/
+        #last-commit {
+            width: 300px;
+        }
+        #last-update {
+            width: 180px;
+        }
+        .container-limited.limit-container-width {
+            max-width: 1280px;
         }
         .open {
             background:#A3E4D770;
@@ -80,7 +96,7 @@
     var isMobile = !!userAgent.match(/(mobile)/i);
     var isPC = !isMobile;
     var isiPad = (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    
+
     var path = window.location.href;
     var isListPage = path.indexOf("dashboard/merge_requests") > -1;
     if (path.indexOf("state=merged") > -1 || path.indexOf("state=closed") > -1 || path.indexOf("state=all") > -1) {
@@ -139,13 +155,13 @@
                     // favicon 字体颜色
                     textColor: "#fff",
                     //背景颜色，设置背景颜色透明，将值设置为“transparent”
-                    backgroundColor: "#fc6d26" 
+                    backgroundColor: "#fc6d26"
                 }
             });
             notify.setFavicon(mrCount).player();
             notify.setTitle(true);
             notify.setTitle(newTitle);
-    
+
             var time = 0;
             setInterval(()=>{
                 if (time % 2 == 0) {
@@ -285,6 +301,16 @@
             class: "open",
         },
         {
+            name: "open/aws流水线",
+            link: "/open/aws/-/pipelines",
+            class: "open",
+        },
+        {
+            name: "open/web",
+            link: "/open/web",
+            class: "open",
+        },
+        {
             name: "open/release",
             link: "/open/release",
             class: "open",
@@ -325,14 +351,19 @@
             class: "vue",
         },
         {
+            name: "vue-aws/aws流水线",
+            link: "/vue-aws/aws/-/pipelines",
+            class: "vue",
+        },
+        {
             name: "vue-aws/awsui",
             link: "/vue-aws/awsui",
             class: "vue",
         },
         {
-            name: "vue-apps/yijingcloud",
-            link: "/vue-apps/yijingcloud",
-            class: "vue-apps",
+            name: "vue-aws/awsui流水线",
+            link: "/vue-aws/awsui/-/pipelines",
+            class: "vue",
         }
     ];
     if (isPC && !isiPad) {
