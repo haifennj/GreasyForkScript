@@ -296,19 +296,14 @@
     // 常用仓库列表
     var repos = [
         {
-            name: "open/aws",
+            name: "aws",
             link: "/open/aws",
             class: "open",
         },
         {
-            name: "open/aws流水线",
-            link: "/open/aws/-/pipelines",
-            class: "open",
-        },
-        {
-            name: "open/web",
-            link: "/open/web",
-            class: "open",
+            name: "apps",
+            link: "/apps",
+            class: "apps",
         },
         {
             name: "open/release",
@@ -316,33 +311,8 @@
             class: "open",
         },
         {
-            name: "apps/bpms",
-            link: "/apps/bpms",
-            class: "apps",
-        },
-        {
-            name: "apps/basic-service",
-            link: "/apps/basic-service",
-            class: "apps",
-        },
-        {
-            name: "apps/office",
-            link: "/apps/office",
-            class: "apps",
-        },
-        {
-            name: "apps/yijingcloud",
-            link: "/apps/yijingcloud",
-            class: "apps",
-        },
-        {
-            name: "security/engine",
-            link: "/security/aws-bpmn-engine",
-            class: "security",
-        },
-        {
-            name: "security/core",
-            link: "/security/aws-infrastructure-core",
+            name: "security",
+            link: "/security",
             class: "security",
         },
         {
@@ -351,13 +321,18 @@
             class: "vue",
         },
         {
-            name: "vue-aws/aws流水线",
-            link: "/vue-aws/aws/-/pipelines",
+            name: "vue-aws/awsui",
+            link: "/vue-aws/awsui",
             class: "vue",
         },
         {
-            name: "vue-aws/awsui",
-            link: "/vue-aws/awsui",
+            name: "open/aws流水线",
+            link: "/open/aws/-/pipelines",
+            class: "open",
+        },
+        {
+            name: "vue-aws/aws流水线",
+            link: "/vue-aws/aws/-/pipelines",
             class: "vue",
         },
         {
