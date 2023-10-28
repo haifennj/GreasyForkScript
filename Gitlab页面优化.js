@@ -306,7 +306,7 @@
             class: "apps",
         },
         {
-            name: "open/release",
+            name: "release",
             link: "/open/release",
             class: "open",
         },
@@ -316,27 +316,32 @@
             class: "security",
         },
         {
-            name: "vue-aws/aws",
+            name: "vue/aws",
             link: "/vue-aws/aws",
             class: "vue",
         },
         {
-            name: "vue-aws/awsui",
+            name: "vue/apps",
+            link: "/vue-apps",
+            class: "vue",
+        },
+        {
+            name: "vue/awsui",
             link: "/vue-aws/awsui",
             class: "vue",
         },
         {
-            name: "open/aws流水线",
+            name: "aws流水线",
             link: "/open/aws/-/pipelines",
             class: "open",
         },
         {
-            name: "vue-aws/aws流水线",
+            name: "vue/aws流水线",
             link: "/vue-aws/aws/-/pipelines",
             class: "vue",
         },
         {
-            name: "vue-aws/awsui流水线",
+            name: "vue/awsui流水线",
             link: "/vue-aws/awsui/-/pipelines",
             class: "vue",
         }
