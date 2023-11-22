@@ -133,7 +133,7 @@
             GM_notification({
                 text: newTitle,
                 title: "合并请求",
-                image:"http://192.168.0.22/assets/gitlab_logo-7ae504fe4f68fdebb3c2034e36621930cd36ea87924c11ff65dbcb8ed50dca58.png",
+                image: "http://192.168.0.22/assets/gitlab_logo-7ae504fe4f68fdebb3c2034e36621930cd36ea87924c11ff65dbcb8ed50dca58.png",
             });
         } catch (error) {
         }
@@ -151,7 +151,7 @@
                 //标题闪烁，或者滚动速度
                 // interval: 500,
                 //可选，默认绿底白字的  Favicon
-                updateFavicon:{
+                updateFavicon: {
                     // favicon 字体颜色
                     textColor: "#fff",
                     //背景颜色，设置背景颜色透明，将值设置为“transparent”
@@ -163,7 +163,7 @@
             notify.setTitle(newTitle);
 
             var time = 0;
-            setInterval(()=>{
+            setInterval(() => {
                 if (time % 2 == 0) {
                     notify.setTitle();
                     notify.setTitle(oldTitle);
@@ -354,7 +354,7 @@
             var li = $("<li class='nav-item'></li>");
             var a = $("<a></a>");
             a.text(element.name);
-            a.attr("target", "_blank");
+            a.attr("target", element.link);
             a.attr("href", element.link);
             a.attr("class", "nav-link custom-link " + element.class);
             li.append(a);
@@ -362,4 +362,36 @@
         });
     }
 
+    // 处理仓库列表添加流水线入口
+    function checkForData() {
+        // Get all elements with the data-testid attribute set to "group-name"
+        var groupNames = document.querySelectorAll('[data-testid="group-name"]');
+
+        // Check if there are any elements found
+        if (groupNames.length > 0) {
+            // Perform the desired action (e.g., add a link after each element)
+            groupNames.forEach(function (groupName) {
+                // Get the current href attribute value
+                var currentHref = groupName.getAttribute('href');
+
+                // Add "/-/pipelines" to the current href value
+                var newHref = currentHref + "/-/pipelines";
+
+                // Create a new link element
+                var linkElement = document.createElement('a');
+                linkElement.setAttribute('href', newHref);
+                linkElement.textContent = 'Pipelines'; // You can change the link text as needed
+                linkElement.target = newHref;
+                linkElement.setAttribute('class', "no-expand gl-mr-3 gl-mt-3");
+
+                // Insert the new link after the current group-name element
+                groupName.parentNode.insertBefore(linkElement, groupName.nextSibling);
+            });
+
+            // Stop the interval since the action has been performed
+            clearInterval(dataCheckInterval);
+        }
+    }
+    // Set up an interval to periodically check for data
+    var dataCheckInterval = setInterval(checkForData, 10); // Check every 1000 milliseconds (1 second)
 })();
