@@ -81,6 +81,9 @@
         .vue-apps {
             background:#D3540070;
         }
+        .pipelines {
+            background:#D3540070;
+        }
     `
     try {
         GM_addStyle(css);
@@ -133,7 +136,7 @@
             GM_notification({
                 text: newTitle,
                 title: "合并请求",
-                image: "http://192.168.0.22/assets/gitlab_logo-7ae504fe4f68fdebb3c2034e36621930cd36ea87924c11ff65dbcb8ed50dca58.png",
+                image:"http://192.168.0.22/assets/gitlab_logo-7ae504fe4f68fdebb3c2034e36621930cd36ea87924c11ff65dbcb8ed50dca58.png",
             });
         } catch (error) {
         }
@@ -151,7 +154,7 @@
                 //标题闪烁，或者滚动速度
                 // interval: 500,
                 //可选，默认绿底白字的  Favicon
-                updateFavicon: {
+                updateFavicon:{
                     // favicon 字体颜色
                     textColor: "#fff",
                     //背景颜色，设置背景颜色透明，将值设置为“transparent”
@@ -163,7 +166,7 @@
             notify.setTitle(newTitle);
 
             var time = 0;
-            setInterval(() => {
+            setInterval(()=>{
                 if (time % 2 == 0) {
                     notify.setTitle();
                     notify.setTitle(oldTitle);
@@ -331,19 +334,24 @@
             class: "vue",
         },
         {
-            name: "aws流水线",
+            name: "后端aws流水线",
             link: "/open/aws/-/pipelines",
-            class: "open",
+            class: "pipelines",
         },
         {
-            name: "vue/aws流水线",
+            name: "前端AI流水线",
+            link: "/vue-apps/ai/-/pipelines",
+            class: "pipelines",
+        },
+        {
+            name: "前端aws流水线",
             link: "/vue-aws/aws/-/pipelines",
-            class: "vue",
+            class: "pipelines",
         },
         {
-            name: "vue/awsui流水线",
+            name: "前端awsui流水线",
             link: "/vue-aws/awsui/-/pipelines",
-            class: "vue",
+            class: "pipelines",
         }
     ];
     if (isPC && !isiPad) {
@@ -361,6 +369,7 @@
             ul.append(li);
         });
     }
+
 
     // 处理仓库列表添加流水线入口
     function checkForData() {
@@ -394,4 +403,29 @@
     }
     // Set up an interval to periodically check for data
     var dataCheckInterval = setInterval(checkForData, 10); // Check every 1000 milliseconds (1 second)
+
+
+    // Save the original XMLHttpRequest open method
+var originalOpen = XMLHttpRequest.prototype.open;
+
+// Intercept and modify the open method
+XMLHttpRequest.prototype.open = function(method, url, async, user, pass) {
+  // Add your logic to check if the URL matches your criteria
+  if (url.includes('children.json')) {
+    // Modify the URL, headers, or any other part of the request as needed
+    url += '/modified-path';
+    // Add headers, e.g., this.setRequestHeader('Authorization', 'Bearer YOUR_TOKEN');
+  }
+
+  // Call the original open method
+  originalOpen.call(this, method, url, async, user, function(){
+
+  alert(1)
+  });
+};
+
+// Example of usage
+//var xhr = new XMLHttpRequest();
+//xhr.open('GET', 'children.json', true);
+//xhr.send();
 })();
