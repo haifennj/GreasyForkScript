@@ -66,22 +66,22 @@
         .container-limited.limit-container-width {
             max-width: 1280px;
         }
-        .open {
+        .tag-open {
             background:#A3E4D770;
         }
-        .apps {
+        .tag-apps {
             background:#BB8FCE70;
         }
-        .security {
+        .tag-security {
             background:#F1948A70;
         }
-        .vue {
+        .tag-vue {
             background:#F8C47170;
         }
-        .vue-apps {
+        .tag-vue-apps {
             background:#D3540070;
         }
-        .pipelines {
+        .tag-pipelines {
             background:#D3540070;
         }
     `
@@ -364,7 +364,7 @@
             a.text(element.name);
             a.attr("target", element.link);
             a.attr("href", element.link);
-            a.attr("class", "nav-link custom-link " + element.class);
+            a.attr("class", "nav-link custom-link tag-" + element.class);
             li.append(a);
             ul.append(li);
         });
