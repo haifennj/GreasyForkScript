@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Gitlab页面优化
 // @namespace    http://tampermonkey.net/
-// @version      1.0.0
+// @version      1.0.1
 // @description  优化Gitlab页面展示内容
 // @author       Haifennj
 // @match        http://192.168.0.22/*
