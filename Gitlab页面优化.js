@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Gitlab页面优化
 // @namespace    http://tampermonkey.net/
-// @version      1.0.1
+// @version      1.0.2
 // @description  优化Gitlab页面展示内容
 // @author       Haifennj
 // @match        http://192.168.0.22/*
@@ -11,6 +11,8 @@
 // @resource     bootstrapCSS https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css
 // @grant        GM_addStyle
 // @grant        GM_notification
+// @downloadURL https://update.greasyfork.org/scripts/460380/Gitlab%E9%A1%B5%E9%9D%A2%E4%BC%98%E5%8C%96.user.js
+// @updateURL https://update.greasyfork.org/scripts/460380/Gitlab%E9%A1%B5%E9%9D%A2%E4%BC%98%E5%8C%96.meta.js
 // ==/UserScript==
 
 (function () {
@@ -54,7 +56,19 @@
         .gl-text-truncate {
             overflow: hidden;
             text-overflow: initial;
-            white-space: initial;
+            white-space: normal;
+            word-break: break-word;
+        }
+        /*流水线列表弹出框的高度*/
+        .show.dropdown .dropdown-menu {
+            max-height: 700px;
+        }
+        .show.dropdown .dropdown-menu .gl-new-dropdown-inner {
+            max-height: 700px;
+        }
+
+        .mini-pipeline-graph-dropdown-menu .scrollable-menu {
+            max-height: 700px;
         }
         /*仓库列表页面优化*/
         #last-commit {
@@ -95,7 +109,6 @@
     }
 
     var userAgent = navigator.userAgent.toLowerCase();
-    console.log(userAgent)
     var isMobile = !!userAgent.match(/(mobile)/i);
     var isPC = !isMobile;
     var isiPad = (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -134,6 +147,7 @@
         document.title = newTitle;
         try {
             GM_notification({
+                tag: "合并请求",
                 text: newTitle,
                 title: "合并请求",
                 image:"http://192.168.0.22/assets/gitlab_logo-7ae504fe4f68fdebb3c2034e36621930cd36ea87924c11ff65dbcb8ed50dca58.png",
@@ -217,11 +231,21 @@
     // ************************************************************ //
     // Merge Request页面，链接添加target标签
     if (isListPage && !isMobile) {
+        // 获取所有带有 .nav-link 类的 <a> 标签
+        const links = document.querySelectorAll('a.nav-link');
+        // 遍历这些链接
+        links.forEach(link => {
+            // 检查链接是否没有 .active 类
+            if (!link.classList.contains('active')) {
+                // 设置 target 属性，值为 href 属性的值
+                link.setAttribute('target', '222');//link.getAttribute('href')
+            }
+        });
         document.querySelectorAll('span[class="merge-request-title-text js-onboarding-mr-item"]').forEach(linkTag => {
             var href = linkTag.children[0].getAttribute("href");
             linkTag.children[0].setAttribute("href", "#");
             linkTag.children[0].setAttribute("onclick", "javascript:window.open('" + href + "','" + href + "')");
-        })
+        });
     }
     // 待办页面，链接添加target标签
     if (isTodoPage && !isMobile) {
@@ -229,7 +253,7 @@
             var href = linkTag.children[0].getAttribute("href");
             linkTag.children[0].setAttribute("href", "#");
             linkTag.children[0].setAttribute("onclick", "javascript:window.open('" + href + "','" + href + "')");
-        })
+        });
     }
 
     // ************************************************************ //
@@ -314,6 +338,11 @@
             class: "open",
         },
         {
+            name: "GitlabCI",
+            link: "/cidevops/GitlabCI",
+            class: "open",
+        },
+        {
             name: "security",
             link: "/security",
             class: "security",
@@ -393,8 +422,17 @@
                 linkElement.target = newHref;
                 linkElement.setAttribute('class', "no-expand gl-mr-3 gl-mt-3");
 
+                // Create a new link element
+                var branchLink = currentHref + "/-/branches/new/";
+                var branchLinkElement = document.createElement('a');
+                branchLinkElement.setAttribute('href', branchLink);
+                branchLinkElement.textContent = '创建新分支'; // You can change the link text as needed
+                branchLinkElement.target = branchLink;
+                branchLinkElement.setAttribute('class', "no-expand gl-mr-3 gl-mt-3");
+
                 // Insert the new link after the current group-name element
                 groupName.parentNode.insertBefore(linkElement, groupName.nextSibling);
+                groupName.parentNode.insertBefore(branchLinkElement, groupName.nextSibling);
             });
 
             // Stop the interval since the action has been performed
@@ -405,27 +443,46 @@
     var dataCheckInterval = setInterval(checkForData, 10); // Check every 1000 milliseconds (1 second)
 
 
-    // Save the original XMLHttpRequest open method
-var originalOpen = XMLHttpRequest.prototype.open;
+    /*To use the  DOMNodeInserted event listening, jquery is required*/
+    $(document).bind('DOMNodeInserted', function(event) {
+        $('a[data-testid="job-with-link"]').each(
+            function(){
+                if (!$(this).attr('target')) {
+                    $(this).attr('target', '_blank')
+                }
+            }
+        );
+    });
 
-// Intercept and modify the open method
-XMLHttpRequest.prototype.open = function(method, url, async, user, pass) {
-  // Add your logic to check if the URL matches your criteria
-  if (url.includes('children.json')) {
-    // Modify the URL, headers, or any other part of the request as needed
-    url += '/modified-path';
-    // Add headers, e.g., this.setRequestHeader('Authorization', 'Bearer YOUR_TOKEN');
-  }
 
-  // Call the original open method
-  originalOpen.call(this, method, url, async, user, function(){
+    // 获取所有的issuable-reference元素
+    const issuableReferences = document.querySelectorAll('.issuable-reference');
 
-  alert(1)
-  });
-};
+    // 遍历每个issuable-reference元素
+    issuableReferences.forEach(reference => {
+        // 获取issuable-reference元素中的文字内容
+        const textContent = reference.textContent.trim();
 
-// Example of usage
-//var xhr = new XMLHttpRequest();
-//xhr.open('GET', 'children.json', true);
-//xhr.send();
+        // 检查issuable-reference中的文字内容是否包含'awsui'字样
+        if (textContent.includes('awsui')) {
+            // 给对应的span添加红色颜色
+            reference.style.color = 'red';
+        }
+    });
+
+    // 获取所有的ref-name元素
+    const refNames = document.querySelectorAll('.ref-name');
+
+    // 遍历每个ref-name元素
+    refNames.forEach(refName => {
+        // 获取ref-name元素中的文字内容
+        const textContent = refName.textContent.trim();
+
+        // 检查ref-name中的文字内容是否包含'6.4.GA'
+        if (textContent.includes('6.4.GA')) {
+            // 给对应的a标签添加蓝色样式
+            refName.querySelector('a').classList.add('blue-text');
+        }
+    });
+
 })();
