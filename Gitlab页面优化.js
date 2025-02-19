@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Gitlab页面优化
 // @namespace    http://tampermonkey.net/
-// @version      1.0.2
+// @version      1.0.3
 // @description  优化Gitlab页面展示内容
 // @author       Haifennj
 // @match        http://192.168.0.22/*
@@ -365,6 +365,21 @@
         {
             name: "后端aws流水线",
             link: "/open/aws/-/pipelines",
+            class: "pipelines",
+        },
+        {
+            name: "security/engine流水线",
+            link: "/security/aws-bpmn-engine/-/pipelines",
+            class: "pipelines",
+        },
+        {
+            name: "security/core流水线",
+            link: "/security/aws-infrastructure-core/-/pipelines",
+            class: "pipelines",
+        },
+        {
+            name: "security/ai流水线",
+            link: "/security/aws-infrastructure-ai/-/pipelines",
             class: "pipelines",
         },
         {
