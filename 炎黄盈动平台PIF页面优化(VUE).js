@@ -14,6 +14,16 @@
 	if(!pageCheck){
 		return;
 	}
+	
+	let css = `
+        a:LINK{color:#53709A}
+        a:VISITED{color:#53709A; TEXT-DECORATION: none;}
+        a:HOVER{color:#53709A}
+    `
+	let el = document.createElement('style')
+	el.type = 'text/css'
+	el.innerHTML = css
+	document.head.appendChild(el);
 
 	function setNewTitle() {
 		var titleElement = document.querySelector('.title-name');
